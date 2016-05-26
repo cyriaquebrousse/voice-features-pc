@@ -10,7 +10,7 @@ import be.tarsos.dsp.io.jvm.AudioDispatcherFactory;
  */
 public class CallRecorder {
 
-  public static final int SAMPLING_RATE = 8_000;
+  public static final int SAMPLING_RATE = 22_050;
   public static final int FRAME_SIZE = 512;
   public static final int FRAME_OVERLAP = 0;
 

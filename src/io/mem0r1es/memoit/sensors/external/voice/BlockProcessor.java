@@ -79,15 +79,14 @@ public class BlockProcessor implements AudioProcessor {
                 Constructor
      ********************************** */
   public BlockProcessor(int[] firstLastSpokenFrames) {
-    if (firstLastSpokenFrames.length != 2) {
-      throw new IllegalArgumentException("first-last spoken frame buffer must be of length 2");
-    }
+    Preconditions.checkArgument(firstLastSpokenFrames.length == 2,
+       "first-last spoken frame buffer must be of length 2");
 
     FIRST_SPOKEN_FRAME = firstLastSpokenFrames[0];
     LAST_SPOKEN_FRAME  = firstLastSpokenFrames[1];
     BLOCK_SIZE = LAST_SPOKEN_FRAME - FIRST_SPOKEN_FRAME;
 
-    this.currentBlockStatBuilder= new BlockStat.Builder(currentFrameNumber, BLOCK_SIZE);
+    this.currentBlockStatBuilder = new BlockStat.Builder(currentFrameNumber, BLOCK_SIZE);
   }
 
   /* **********************************

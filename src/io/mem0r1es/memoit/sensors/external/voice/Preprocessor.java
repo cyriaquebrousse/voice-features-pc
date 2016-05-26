@@ -1,4 +1,6 @@
-package io.mem0r1es.memoit.sensors.external.voice.util;
+package io.mem0r1es.memoit.sensors.external.voice;
+
+import com.google.common.base.Preconditions;
 
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 
@@ -7,7 +9,6 @@ import java.util.List;
 
 import be.tarsos.dsp.AudioEvent;
 import be.tarsos.dsp.AudioProcessor;
-import io.mem0r1es.memoit.sensors.external.voice.BlockProcessor;
 
 import static io.mem0r1es.memoit.sensors.external.voice.CallRecorder.FRAME_SIZE;
 import static io.mem0r1es.memoit.sensors.external.voice.CallRecorder.SAMPLING_RATE;
@@ -30,9 +31,7 @@ public class Preprocessor implements AudioProcessor {
    * @param output output buffer that will contain (start,end) when the processor has finished
    */
   public Preprocessor(int[] output) {
-    if (output.length != 2) {
-      throw new IllegalArgumentException("output buffer must be of length 2 (start,end)");
-    }
+    Preconditions.checkArgument(output.length == 2, "output buffer must be of length 2 (start,end)");
 
     this.output = output;
   }
@@ -49,7 +48,6 @@ public class Preprocessor implements AudioProcessor {
 
   @Override
   public void processingFinished() {
-    System.out.println("# Preprocessor for silence finished and yields:");
     // determine silence threshold
     // that is, 0.5% of maximal energy for the voice excerpt
     final DescriptiveStatistics stat = getStat(energies);

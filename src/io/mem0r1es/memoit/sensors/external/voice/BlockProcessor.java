@@ -98,6 +98,17 @@ public class BlockProcessor implements AudioProcessor {
   public boolean process(AudioEvent event) {
     final float[] frame = event.getFloatBuffer();
 
+    // do not perform computations if we are outside the spoken duration
+    if (currentFrameNumber < FIRST_SPOKEN_FRAME) {
+      currentFrameNumber++;
+      return true;
+    }
+
+    if (currentFrameNumber > LAST_SPOKEN_FRAME) {
+      currentFrameNumber++;
+      return false;
+    }
+
     // pitch extraction
     final PitchDetectionResult pitchResult = PITCH_DETECTOR.getPitch(frame);
     if (pitchResult.isPitched()) {

@@ -16,7 +16,6 @@ import java.util.Map.Entry;
 
 import be.tarsos.dsp.beatroot.Peaks;
 
-import static io.mem0r1es.memoit.sensors.external.voice.BlockProcessor.BLOCK_SIZE;
 import static io.mem0r1es.memoit.sensors.external.voice.BlockProcessor.FREQUENCY_BANDS;
 import static io.mem0r1es.memoit.sensors.external.voice.CallRecorder.FRAME_SIZE;
 import static io.mem0r1es.memoit.sensors.external.voice.CallRecorder.SAMPLING_RATE;
@@ -46,11 +45,14 @@ public class BlockStat {
   public static final class Builder {
     public final long startId;
 
+    /** Frame block size. Assumes no overlap. */
+    public final int BLOCK_SIZE;
+
     /** Extracted pitch for each frame */
-    public final ArrayList<Float> pitches = new ArrayList<>(BLOCK_SIZE);
+    public final ArrayList<Float> pitches = new ArrayList<>();
 
     /** Extracted energy for each frame */
-    public final ArrayList<Float> energies = new ArrayList<>(BLOCK_SIZE);
+    public final ArrayList<Float> energies = new ArrayList<>();
 
     /** For each band: (band_center, band_energy[frame0..frameN] ) */
     public final Map<Float, List<Float>> bandsEnergies = new HashMap<>();
@@ -60,8 +62,9 @@ public class BlockStat {
       }
     }
 
-    public Builder(long startId) {
+    public Builder(long startId, int blockSize) {
       this.startId = startId;
+      BLOCK_SIZE = blockSize;
     }
 
     public BlockStat build() {
@@ -171,8 +174,8 @@ public class BlockStat {
       }));
     }
 
-    private DescriptiveStatistics getStat(Iterable<Float> in) {
-      DescriptiveStatistics stat = new DescriptiveStatistics(BLOCK_SIZE);
+    public static DescriptiveStatistics getStat(Iterable<Float> in) {
+      DescriptiveStatistics stat = new DescriptiveStatistics();
       for (float f : in) {
         stat.addValue(f);
       }

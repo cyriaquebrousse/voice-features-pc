@@ -45,7 +45,13 @@ public class BlockProcessor implements AudioProcessor {
              Processing constants
      ********************************** */
   /** Frame block size. Assumes no overlap. */
-  public static final int BLOCK_SIZE = (int) Math.floor(2 * SAMPLING_RATE / FRAME_SIZE);
+  private final int BLOCK_SIZE;
+
+  /** First non-silent frame. Determined in advance. */
+  private final int FIRST_SPOKEN_FRAME;
+
+  /** Last non-silent frame. Determined in advance. */
+  private final int LAST_SPOKEN_FRAME;
 
   /** Lower bound of allowed pitch interval (Hz) */
   private static final int MIN_PITCH = 40;
@@ -67,7 +73,26 @@ public class BlockProcessor implements AudioProcessor {
   private final List<BlockStat> stats = new ArrayList<>();
 
   /** Accumulator for values for one block of frames, on which stats are then computed */
-  private BlockStat.Builder currentBlockStatBuilder = new BlockStat.Builder(currentFrameNumber);
+  private BlockStat.Builder currentBlockStatBuilder;
+
+  /* **********************************
+                Constructor
+     ********************************** */
+  public BlockProcessor(int[] firstLastSpokenFrames) {
+    if (firstLastSpokenFrames.length != 2) {
+      throw new IllegalArgumentException("first-last spoken frame buffer must be of length 2");
+    }
+
+    FIRST_SPOKEN_FRAME = firstLastSpokenFrames[0];
+    LAST_SPOKEN_FRAME  = firstLastSpokenFrames[1];
+    BLOCK_SIZE = LAST_SPOKEN_FRAME - FIRST_SPOKEN_FRAME;
+
+    this.currentBlockStatBuilder= new BlockStat.Builder(currentFrameNumber, BLOCK_SIZE);
+  }
+
+  /* **********************************
+               Pipeline methods
+     ********************************** */
 
   @Override
   public boolean process(AudioEvent event) {
@@ -98,7 +123,7 @@ public class BlockProcessor implements AudioProcessor {
       // get ready for the next block
       stats.add(currentBlockStatBuilder.build());
       System.out.println("CallStat: " + stats.get(stats.size() - 1).toString());
-      currentBlockStatBuilder = new BlockStat.Builder(currentFrameNumber);
+      currentBlockStatBuilder = new BlockStat.Builder(currentFrameNumber, BLOCK_SIZE);
     }
 
     // never break the chain
@@ -115,7 +140,7 @@ public class BlockProcessor implements AudioProcessor {
    * @param frame the audio frame
    * @return The local (linear) energy of an audio buffer.
    */
-  private double smoothedEnergy(final float[] frame) {
+  public static double smoothedEnergy(final float[] frame) {
     final float[] windowedFrame = Arrays.copyOf(frame, frame.length);
     WINDOW_FUNCTION.apply(windowedFrame);
 

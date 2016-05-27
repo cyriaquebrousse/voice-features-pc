@@ -13,10 +13,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 
 import be.tarsos.dsp.beatroot.Peaks;
 
 import static io.mem0r1es.memoit.sensors.external.voice.BlockProcessor.FREQUENCY_BANDS;
+import static io.mem0r1es.memoit.sensors.external.voice.CallRecorder.EMOTION_MAPPER;
 import static io.mem0r1es.memoit.sensors.external.voice.CallRecorder.FRAME_SIZE;
 import static io.mem0r1es.memoit.sensors.external.voice.CallRecorder.SAMPLING_RATE;
 import static io.mem0r1es.memoit.sensors.external.voice.util.CollectionsUtils.unzipLeft;
@@ -37,6 +39,28 @@ public class BlockStat {
   public BlockStat(long startId, ImmutableMap<String, Number> stats) {
     this.startId = startId;
     this.stats = stats;
+  }
+
+  public void printWithEmotion(String fileName) {
+    // remove extension
+    if (fileName.contains(".")) {
+      fileName = fileName.substring(0, fileName.lastIndexOf("."));
+    }
+
+    final Optional<String> emotion = Optional.ofNullable(EMOTION_MAPPER.get(fileName));
+
+    if (!emotion.isPresent()) {
+      System.err.println("[E] missing mapping for file " + fileName);
+      return;
+    }
+
+    stats.forEach((desc, stat) -> System.out.print(stat + ","));
+    System.out.print("'" + fileName + "',");
+    System.out.print(emotion.get());
+  }
+
+  public void printHeader() {
+    stats.forEach((desc, stat) -> System.out.println(desc));
   }
 
   /**

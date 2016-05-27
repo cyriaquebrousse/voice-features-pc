@@ -53,6 +53,9 @@ public class BlockProcessor implements AudioProcessor {
   /** Last non-silent frame. Determined in advance. */
   private final int LAST_SPOKEN_FRAME;
 
+  /** Name of the file currently being processed */
+  private final String FILE_NAME;
+
   /** Lower bound of allowed pitch interval (Hz) */
   private static final int MIN_PITCH = 40;
 
@@ -78,13 +81,15 @@ public class BlockProcessor implements AudioProcessor {
   /* **********************************
                 Constructor
      ********************************** */
-  public BlockProcessor(int[] firstLastSpokenFrames) {
+  public BlockProcessor(int[] firstLastSpokenFrames, String fileName) {
     Preconditions.checkArgument(firstLastSpokenFrames.length == 2,
        "first-last spoken frame buffer must be of length 2");
 
     FIRST_SPOKEN_FRAME = firstLastSpokenFrames[0];
     LAST_SPOKEN_FRAME  = firstLastSpokenFrames[1];
     BLOCK_SIZE = LAST_SPOKEN_FRAME - FIRST_SPOKEN_FRAME;
+
+    FILE_NAME = fileName;
 
     this.currentBlockStatBuilder = new BlockStat.Builder(currentFrameNumber, BLOCK_SIZE);
   }
@@ -132,7 +137,7 @@ public class BlockProcessor implements AudioProcessor {
     if (currentFrameNumber % BLOCK_SIZE == 0) {
       // get ready for the next block
       stats.add(currentBlockStatBuilder.build());
-      System.out.println("CallStat: " + stats.get(stats.size() - 1).toString());
+      stats.get(stats.size() - 1).printWithEmotion(FILE_NAME);
       currentBlockStatBuilder = new BlockStat.Builder(currentFrameNumber, BLOCK_SIZE);
     }
 

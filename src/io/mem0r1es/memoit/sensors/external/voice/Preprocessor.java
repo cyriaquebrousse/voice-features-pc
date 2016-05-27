@@ -57,7 +57,6 @@ public class Preprocessor implements AudioProcessor {
     for (int i = 0; i < energies.size(); i++) {
       if (energies.get(i) > silenceThreshold) {
         output[0] = i;
-        System.out.println("START @ " + i + " : " + frameToTime(i));
         break;
       }
     }
@@ -66,7 +65,6 @@ public class Preprocessor implements AudioProcessor {
     for (int i = energies.size() - 1; i >= 0; i--) {
       if (energies.get(i) > silenceThreshold) {
         output[1] = i;
-        System.out.println("END @ " + i + " : " + frameToTime(i) + "\n");
         break;
       }
     }

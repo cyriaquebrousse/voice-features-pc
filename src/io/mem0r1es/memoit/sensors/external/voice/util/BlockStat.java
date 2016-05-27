@@ -55,7 +55,7 @@ public class BlockStat {
     }
 
     stats.forEach((desc, stat) -> System.out.print(stat + ","));
-    System.out.print("'" + fileName + "',");
+    System.out.print(fileName + ",");
     System.out.print(emotion.get());
   }
 

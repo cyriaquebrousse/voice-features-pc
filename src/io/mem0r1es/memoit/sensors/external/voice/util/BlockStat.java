@@ -44,7 +44,7 @@ public class BlockStat {
   public void printWithEmotion(String fileName) {
     // remove extension
     if (fileName.contains(".")) {
-      fileName = fileName.substring(0, fileName.lastIndexOf("."));
+      fileName = fileName.substring(0, fileName.indexOf("."));
     }
 
     final Optional<String> emotion = Optional.ofNullable(EMOTION_MAPPER.get(fileName));

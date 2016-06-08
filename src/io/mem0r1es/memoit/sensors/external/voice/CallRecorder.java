@@ -64,7 +64,6 @@ public class CallRecorder {
 
     // map the source file to the target file
     PitchShiftingExample.startCli(file.getAbsolutePath(), target.getAbsolutePath(), numSemitones * 100);
-    System.err.println("Shifted from " + pitchMean + " Hz by " + numSemitones + " semitones");
   }
 
   private static AudioDispatcher newPitchDetector(File file, List<Float> pitches) throws Exception {

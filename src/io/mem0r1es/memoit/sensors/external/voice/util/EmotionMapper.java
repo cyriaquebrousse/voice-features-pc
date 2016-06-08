@@ -6,11 +6,11 @@ import java.util.HashMap;
 import static io.mem0r1es.memoit.sensors.external.voice.util.FileUtils.foreachNonEmptyLine;
 
 /**
- * Maps file_name -> coarse_emotion
+ * Maps file_name -> coarse_emotion -> binary_emotion
  *
  * @author Cyriaque Brousse
  */
-public class EmotionMapper extends HashMap<String, String> {
+public class EmotionMapper extends HashMap<String, Pair<String, String>> {
 
   private static final String MAPPING_PATH = "emotion_mapping.csv";
 
@@ -19,7 +19,7 @@ public class EmotionMapper extends HashMap<String, String> {
     try {
       foreachNonEmptyLine(MAPPING_PATH, line -> {
         final String[] elems = line.split(",");
-        if (elems.length != 3) {
+        if (elems.length != 4) {
           System.err.println(line + "was invalid");
         }
 
@@ -28,7 +28,7 @@ public class EmotionMapper extends HashMap<String, String> {
           elems[0] = elems[0].substring(0, elems[0].lastIndexOf("."));
         }
 
-        put(elems[0], elems[2]);
+        put(elems[0], Pair.create(elems[2], elems[3]));
       });
     } catch (IOException e) {
       e.printStackTrace();

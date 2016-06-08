@@ -47,7 +47,8 @@ public class BlockStat {
       fileName = fileName.substring(0, fileName.indexOf("."));
     }
 
-    final Optional<String> emotion = Optional.ofNullable(EMOTION_MAPPER.get(fileName));
+    // sample -> (coarse_emotion,binary_emotion)
+    final Optional<Pair<String, String>> emotion = Optional.ofNullable(EMOTION_MAPPER.get(fileName));
 
     if (!emotion.isPresent()) {
       System.err.println("[E] missing mapping for file " + fileName);
@@ -56,7 +57,8 @@ public class BlockStat {
 
     stats.forEach((desc, stat) -> System.out.print(stat + ","));
     System.out.print(fileName + ",");
-    System.out.print(emotion.get());
+    System.out.print(emotion.get().first + ",");
+    System.out.print(emotion.get().second);
   }
 
   public void printHeader() {

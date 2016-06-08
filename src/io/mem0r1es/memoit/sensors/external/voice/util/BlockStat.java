@@ -109,12 +109,14 @@ public class BlockStat {
         final float pitchStdDev = (float) pitchStat.getStandardDeviation();
 
         stat.put("pitchMean", pitchMean)
-           .put("pitchMedian", (float) pitchStat.getPercentile(0.50))
+           .put("pitchMedian", (float) pitchStat.getPercentile(50.0))
            .put("pitchStdDev", pitchStdDev)
            .put("pitchMax", (float) pitchStat.getMax())
            .put("pitchRange", (float) (pitchStat.getMax() - pitchStat.getMin()))
-           .put("pitchUpSlopeMedian", (float) pitchUpSlopeStat.getPercentile(0.50))
-           .put("pitchDownSlopeMedian", (float) pitchDownSlopeStat.getPercentile(0.50))
+           .put("pitchUpSlopeMedian", (float) pitchUpSlopeStat.getPercentile(50.0))
+           .put("pitchUpSlopeMean", (float) pitchUpSlopeStat.getMean())
+           .put("pitchDownSlopeMedian", (float) pitchDownSlopeStat.getPercentile(50.0))
+           .put("pitchDownSlopeMean", (float) pitchDownSlopeStat.getMean())
            .put("pitchUpFramesRatio", (float) pitchUpSlopeStat.getN() / (float) BLOCK_SIZE)
            .put("pitchVoicedFramesRatio", (float) pitches.size() / (float) BLOCK_SIZE);
 
@@ -149,12 +151,12 @@ public class BlockStat {
         meanGlobalEnergy = (float) energyStat.getMean();
 
         stat.put("energyMean", meanGlobalEnergy)
-            .put("energyMedian", (float) energyStat.getPercentile(0.50))
+            .put("energyMedian", (float) energyStat.getPercentile(50.0))
             .put("energyStdDev", (float) energyStat.getStandardDeviation())
             .put("energyMax", (float) energyStat.getMax())
             .put("energyRange", (float) (energyStat.getMax() - energyStat.getMin()))
-            .put("energyUpSlopeMedian", (float) energyUpSlopeStat.getPercentile(0.50))
-            .put("energyDownSlopeMedian", (float) energyDownSlopeStat.getPercentile(0.50))
+            .put("energyUpSlopeMedian", (float) energyUpSlopeStat.getPercentile(50.0))
+            .put("energyDownSlopeMedian", (float) energyDownSlopeStat.getPercentile(50.0))
             .put("energyUpFramesRatio", (float) energyUpSlopeStat.getN() / (float) BLOCK_SIZE);
       }
 
@@ -170,7 +172,7 @@ public class BlockStat {
 
         final String prefix = "band" + center + '_';
         stat.put(prefix + "energyMean", meanBandEnergy)
-           .put(prefix + "energyMedian", (float) energyStat.getPercentile(0.50))
+           .put(prefix + "energyMedian", (float) energyStat.getPercentile(50.0))
            .put(prefix + "energyStdDev", (float) energyStat.getStandardDeviation())
            .put(prefix + "energyMax", (float) energyStat.getMax())
            .put(prefix + "energyRange", (float) (energyStat.getMax() - energyStat.getMin()))

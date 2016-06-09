@@ -23,6 +23,7 @@ import static io.mem0r1es.memoit.sensors.external.voice.CallRecorder.FRAME_SIZE;
 import static io.mem0r1es.memoit.sensors.external.voice.CallRecorder.SAMPLING_RATE;
 import static io.mem0r1es.memoit.sensors.external.voice.util.CollectionsUtils.unzipLeft;
 import static io.mem0r1es.memoit.sensors.external.voice.util.CollectionsUtils.unzipRight;
+import static io.mem0r1es.memoit.sensors.external.voice.util.MfccPipeline.NUM_CEPSTRUM_COEF;
 
 /**
  * Holds the statistics for each block of frames
@@ -75,16 +76,19 @@ public class BlockStat {
     public final int BLOCK_SIZE;
 
     /** Extracted pitch for each frame */
-    public final ArrayList<Float> pitches = new ArrayList<>();
+    public final List<Float> pitches = new ArrayList<>();
 
     /** Extracted energy for each frame */
-    public final ArrayList<Float> energies = new ArrayList<>();
+    public final List<Float> energies = new ArrayList<>();
+
+    /** Extracted MFCCs for each frame */
+    public final List<float[]> mfccs = new ArrayList<>();
 
     /** For each band: (band_center, band_energy[frame0..frameN] ) */
     public final Map<Float, List<Float>> bandsEnergies = new HashMap<>();
     {
       for (Pair<Float, Float> band : FREQUENCY_BANDS) {
-        bandsEnergies.put(band.first, new ArrayList<Float>());
+        bandsEnergies.put(band.first, new ArrayList<>());
       }
     }
 
@@ -177,6 +181,33 @@ public class BlockStat {
            .put(prefix + "energyMax", (float) energyStat.getMax())
            .put(prefix + "energyRange", (float) (energyStat.getMax() - energyStat.getMin()))
            .put(prefix + "energyRatio", meanBandEnergy / meanGlobalEnergy);
+      }
+
+      /* **********************************
+                   Stats on MFCCs
+         ********************************** */
+      for (int i = 0; i < NUM_CEPSTRUM_COEF; ++i) {
+        // get the ith coefficient for each frame
+        final List<Float> coeffs = new ArrayList<>();
+        for (float[] c : mfccs) {
+          coeffs.add(c[i]);
+        }
+
+        // compute statistics on the ith coefficient
+        final DescriptiveStatistics coefStat = getStat(coeffs);
+        final DescriptiveStatistics coefDerivativeStat = getStat(getDerivatives(coeffs));
+
+        final String prefix = "mfcc" + i + '_';
+        stat.put(prefix + "mean", (float) coefStat.getMean())
+           .put(prefix + "median", (float) coefStat.getPercentile(50.0))
+           .put(prefix + "stdDev", (float) coefStat.getStandardDeviation())
+           .put(prefix + "max", (float) coefStat.getMax())
+           .put(prefix + "range", (float) (coefStat.getMax() - coefStat.getMin()))
+           .put(prefix + "derivMean", (float) coefDerivativeStat.getMean())
+           .put(prefix + "derivMedian", (float) coefDerivativeStat.getPercentile(0.50))
+           .put(prefix + "derivStdDev", (float) coefDerivativeStat.getStandardDeviation())
+           .put(prefix + "derivMax", (float) coefDerivativeStat.getMax())
+           .put(prefix + "derivRange", (float) (coefDerivativeStat.getMax() - coefDerivativeStat.getMin()));
       }
 
       return new BlockStat(startId, stat.build());

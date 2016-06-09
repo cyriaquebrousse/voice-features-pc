@@ -18,6 +18,7 @@ import be.tarsos.dsp.util.fft.HammingWindow;
 import be.tarsos.dsp.util.fft.WindowFunction;
 import io.mem0r1es.memoit.sensors.external.voice.util.BandPassFilter;
 import io.mem0r1es.memoit.sensors.external.voice.util.BlockStat;
+import io.mem0r1es.memoit.sensors.external.voice.util.MfccPipeline;
 import io.mem0r1es.memoit.sensors.external.voice.util.Pair;
 
 import static be.tarsos.dsp.pitch.PitchProcessor.PitchEstimationAlgorithm.FFT_YIN;
@@ -39,7 +40,10 @@ public class BlockProcessor implements AudioProcessor {
   private static final PitchDetector PITCH_DETECTOR = FFT_YIN.getDetector(SAMPLING_RATE, FRAME_SIZE);
 
   /** Window function. Gives more weight to the center of a frame. */
-  private static final WindowFunction WINDOW_FUNCTION = new HammingWindow();
+  public static final WindowFunction WINDOW_FUNCTION = new HammingWindow();
+
+  /** Pipeline used to compute MFCCs */
+  private static final MfccPipeline MFCC_PIPELINE = new MfccPipeline();
 
   /* **********************************
              Processing constants
@@ -64,7 +68,9 @@ public class BlockProcessor implements AudioProcessor {
 
   /** Pairs of frequency bands (band_center,band_width) to extract energy from (Hz) */
   public static final ImmutableList<Pair<Float, Float>> FREQUENCY_BANDS =
-     initBands(0, 500, 1000, 2000, 3000, 4000, 5000, 7000, 9000);
+//     initBands(0, 500, 1000, 2000, 3000, 4000, 5000, 7000, 9000);
+     initBands(0, 101, 204, 309, 417, 531, 651, 781, 922, 1079, 1255, 1456,
+               1691, 1968, 2302, 2711, 3212, 3822, 4554, 5412, 6414, 7617);
 
   /* **********************************
                 Accumulators
@@ -131,6 +137,9 @@ public class BlockProcessor implements AudioProcessor {
       // retrieve list of band energies, and add new value to it
       currentBlockStatBuilder.bandsEnergies.get(bandEnergy.first).add(bandEnergy.second);
     }
+
+    // MFCC processing
+    currentBlockStatBuilder.mfccs.add(MFCC_PIPELINE.process(frame));
 
     // handle going to the next frame
     currentFrameNumber++;

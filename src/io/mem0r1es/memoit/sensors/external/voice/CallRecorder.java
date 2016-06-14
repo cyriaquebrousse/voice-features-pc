@@ -21,7 +21,7 @@ import static be.tarsos.dsp.pitch.PitchProcessor.PitchEstimationAlgorithm.FFT_YI
  */
 public class CallRecorder {
 
-  public static final int SAMPLING_RATE = 22_050;
+  public static final int SAMPLING_RATE = 44_100;
   public static final int FRAME_SIZE = 512;
   public static final int FRAME_OVERLAP = 0;
 

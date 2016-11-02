@@ -4,3 +4,4 @@ out/
 .idea
 voice-samples/
 out.txt
+_training*
